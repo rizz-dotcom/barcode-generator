@@ -1,2 +1,40 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+#include <iostream>
+#include <string>
+#include <map>
+#include <opencv2/opencv.hpp>
+#include <vector>
+#include <algorithm>
+#include <limits>
+
+using namespace std;
+using namespace cv;
+
+// Code 39 encoding table
+// 0 = Narrow, 1 = Wide
+
+map<char, string> code39 =
+{
+    {'0', "000110100"},
+    {'1', "100100001"},
+    {'2', "001100001"},
+    {'3', "101100000"},
+    {'4', "000110001"},
+    {'5', "100110000"},
+    {'6', "001110000"},
+    {'7', "000100101"},
+    {'8', "100100100"},
+    {'9', "001100100"},
+    {'*', "010010100"}
+};
+
+// Barcode dimensions
+const int NARROW = 3;
+const int WIDE = 9;
+
+const int BAR_HEIGHT = 125;
+const int QUIET_ZONE = 60;
+const int IMAGE_HEIGHT = 190;
+
+// Function 1: Validate six-digit number
+
+
