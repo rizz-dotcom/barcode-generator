@@ -94,6 +94,38 @@ Mat drawBarcode(string data)
         Scalar(255, 255, 255)
     );
 
+    int x = QUIET_ZONE;
+
+    for (int i = 0; i < data.length(); i++)
+    {
+        string pattern = code39.at(data[i]);
+
+        for (int j = 0; j < pattern.length(); j++)
+        {
+            int elementWidth = getWidth(pattern[j]);
+
+            // Even positions represent black bars
+            if (j % 2 == 0)
+            {
+                rectangle(
+                    image,
+                    Rect(x, 10, elementWidth, BAR_HEIGHT),
+                    Scalar(0, 0, 0),
+                    FILLED
+                );
+            }
+
+            x += elementWidth;
+        }
+
+        // Add white gap between characters
+        if (i != data.length() - 1)
+            x += NARROW;
+    }
+
+    return image;
+}
+
 
 
 
