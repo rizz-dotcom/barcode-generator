@@ -36,5 +36,28 @@ const int QUIET_ZONE = 60;
 const int IMAGE_HEIGHT = 190;
 
 // Function 1: Validate six-digit number
+bool validateNumber(string number)
+{
+    if (number.length() != 6)
+        return false;
+
+    for (int i = 0; i < number.length(); i++)
+    {
+        if (number[i] < '0' || number[i] > '9')
+            return false;
+    }
+
+    return true;
+}
+
+// Function 2: Get width of an element
+int getWidth(char element)
+{
+    if (element == '0')
+        return NARROW;
+
+    return WIDE;
+}
+
 
 
