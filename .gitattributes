@@ -126,6 +126,76 @@ Mat drawBarcode(string data)
     return image;
 }
 
+// Function 5: Add human-readable number
+void addNumber(Mat& image, string number)
+{
+    int font = FONT_HERSHEY_SIMPLEX;
+    double scale = 0.8;
+    int thickness = 2;
 
+    int baseline;
+
+    Size textSize = getTextSize(
+        number,
+        font,
+        scale,
+        thickness,
+        &baseline
+    );
+
+    int x = (image.cols - textSize.width) / 2;
+
+    putText(
+        image,
+        number,
+        Point(x, 175),
+        font,
+        scale,
+        Scalar(0, 0, 0),
+        thickness
+    );
+}
+
+// Function 6: Generate and save barcode
+void generateBarcode(string number)
+{
+    if (!validateNumber(number))
+    {
+        cout << "Invalid input! Enter exactly six digits.\n";
+        return;
+    }
+
+    // Add start and stop characters
+    string data = "*" + number + "*";
+
+    // Generate barcode image
+    Mat barcode = drawBarcode(data);
+
+    // Add number below barcode
+    addNumber(barcode, number);
+
+    // Save image
+    if (imwrite("barcode.bmp", barcode))
+    {
+        cout << "\nBarcode generated successfully!\n";
+        cout << "Saved as barcode.bmp\n";
+
+        imshow("Generated Barcode", barcode);
+        waitKey(0);
+        destroyAllWindows();
+    }
+    else
+    {
+        cout << "Unable to save barcode image!\n";
+    }
+}
+
+
+// One continuous group of pixels
+struct Run
+{
+    bool black;
+    int width;
+};
 
 
