@@ -198,4 +198,81 @@ struct Run
     int width;
 };
 
+// Function 1: Read pixels and count consecutive colors (zaab) ->
+vector<Run> getRuns(Mat image, int row)
+{
+    vector<Run> runs;
 
+    bool currentColor = false;
+    int count = 0;
+    bool started = false;
+
+    for (int x = 0; x < image.cols; x++)
+    {
+        bool black = image.at<uchar>(row, x) < 128;
+
+        // Ignore white space before barcode
+        if (!started)
+        {
+            if (!black)
+                continue;
+
+            currentColor = true;
+            count = 1;
+            started = true;
+        }
+        else if (black == currentColor)
+        {
+            count++;
+        }
+        else
+        {
+            runs.push_back({ currentColor, count });
+
+            currentColor = black;
+            count = 1;
+        }
+    }
+
+    if (started)
+        runs.push_back({ currentColor, count });
+
+    return runs;
+}
+
+
+// Function 2: Convert nine widths into a pattern
+string getPattern(vector<Run> runs, int start)
+{
+    vector<int> positions;
+
+    for (int i = 0; i < 9; i++)
+    {
+        positions.push_back(i);
+    }
+
+    // Sort positions according to their pixel widths
+    sort(positions.begin(), positions.end(),
+        [&](int a, int b)
+        {
+            return runs[start + a].width >
+                runs[start + b].width;
+        });
+
+    // Three largest should be wide
+    int smallestWide = runs[start + positions[2]].width;
+    int largestNarrow = runs[start + positions[3]].width;
+
+    // Check that wide and narrow are distinguishable
+    if (smallestWide < largestNarrow * 1.7)
+        return "";
+
+    string pattern = "000000000";
+
+    for (int i = 0; i < 3; i++)
+    {
+        pattern[positions[i]] = '1';
+    }
+
+    return pattern;
+}   // <--
