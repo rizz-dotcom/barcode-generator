@@ -275,4 +275,17 @@ string getPattern(vector<Run> runs, int start)
     }
 
     return pattern;
-}   // <--
+}  
+// Function 3: Find character using our encoding table
+char findCharacter(string pattern)
+{
+    for (auto item : code39)
+    {
+        if (item.second == pattern)
+            return item.first;
+    }
+
+    return '?';
+}
+
+// <--
