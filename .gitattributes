@@ -388,4 +388,74 @@ string decodeImage(Mat image)
 
     return "";
 }
-// <--
+
+// Function 6: Upload image and display decoded number
+void uploadAndDecode()
+{
+    string path;
+
+    cout << "\nEnter image path: ";
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, path);
+
+    Mat image = imread(path, IMREAD_GRAYSCALE);
+
+    if (image.empty())
+    {
+        cout << "Unable to open image!\n";
+        return;
+    }
+
+    string result = decodeImage(image);
+
+    if (result == "")
+    {
+        cout << "Invalid or unreadable barcode!\n";
+    }
+    else
+    {
+        cout << "\nBarcode decoded successfully!\n";
+        cout << "Original number: " << result << endl;
+    }
+}
+
+int main()
+{
+    int choice;
+    string number;
+
+    do
+    {
+        cout << "\n========== BARCODE SYSTEM ==========\n";
+        cout << "1. Generate Barcode\n";
+        cout << "2. Decode Barcode Image\n";
+        cout << "3. Exit\n";
+
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice == 1)
+        {
+            cout << "Enter six-digit number: ";
+            cin >> number;
+
+            generateBarcode(number);
+        }
+        else if (choice == 2)
+        {
+            uploadAndDecode();
+        }
+        else if (choice == 3)
+        {
+            cout << "Program closed.\n";
+        }
+        else
+        {
+            cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 3);
+
+    return 0;
+}
