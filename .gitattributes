@@ -287,5 +287,105 @@ char findCharacter(string pattern)
 
     return '?';
 }
+// Function 4: Decode one horizontal row
+string decodeRow(Mat image, int row)
+{
+    vector<Run> runs = getRuns(image, row);
 
+    string result = "";
+
+    int position = 0;
+    int characters = 0;
+
+    while (position + 8 < runs.size())
+    {
+        // Check alternating black and white elements
+        for (int j = 0; j < 9; j++)
+        {
+            bool expectedBlack = (j % 2 == 0);
+
+            if (runs[position + j].black != expectedBlack)
+                return "";
+        }
+
+        // Recover the nine-element pattern
+        string pattern = getPattern(runs, position);
+
+        if (pattern == "")
+            return "";
+
+        // Find the original character
+        char character = findCharacter(pattern);
+
+        if (character == '?')
+            return "";
+
+        result += character;
+        characters++;
+
+        // Move past the nine elements
+        position += 9;
+
+        // Skip white gap between characters
+        if (position < runs.size())
+        {
+            if (runs[position].black)
+                return "";
+
+            position++;
+        }
+    }
+
+    // Our barcode contains 8 characters:
+    // Start + six digits + Stop
+    if (characters != 8 || position != runs.size())
+        return "";
+
+    // Check start and stop characters
+    if (result[0] != '*' || result[7] != '*')
+        return "";
+
+    // Remove start and stop characters
+    string number = result.substr(1, 6);
+
+    if (!validateNumber(number))
+        return "";
+
+    return number;
+}
+
+
+// Function 5: Decode the complete image
+string decodeImage(Mat image)
+{
+    if (image.empty())
+        return "";
+
+    Mat gray;
+
+    if (image.channels() == 3)
+        cvtColor(image, gray, COLOR_BGR2GRAY);
+    else if (image.channels() == 4)
+        cvtColor(image, gray, COLOR_BGRA2GRAY);
+    else
+        gray = image.clone();
+
+    // Convert to black and white
+    Mat binary;
+
+    threshold(gray, binary, 128, 255, THRESH_BINARY);
+
+    // Try multiple horizontal rows
+    for (int row = binary.rows / 3;
+        row <= (binary.rows * 2) / 3;
+        row += 3)
+    {
+        string result = decodeRow(binary, row);
+
+        if (result != "")
+            return result;
+    }
+
+    return "";
+}
 // <--
