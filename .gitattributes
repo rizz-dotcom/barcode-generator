@@ -38,7 +38,7 @@ const int IMAGE_HEIGHT = 190;
 // Function 1: Validate six-digit number
 bool validateNumber(string number)
 {
-    if (number.length() != 6)
+    if (number.length() != 6 || number[0] == '0')
         return false;
 
     for (int i = 0; i < number.length(); i++)
@@ -49,7 +49,6 @@ bool validateNumber(string number)
 
     return true;
 }
-
 // Function 2: Get width of an element
 int getWidth(char element)
 {
