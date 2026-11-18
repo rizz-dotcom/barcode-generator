@@ -62,6 +62,26 @@ string currentTime()
     return formatTime("%H:%M:%S");
 }
 
+string currentDay()
+{
+    return formatTime("%d");
+}
+
+int countLines(string fileName)
+{
+    ifstream file(fileName);
+
+    string line;
+    int count = 0;
+
+    while (getline(file, line))
+    {
+        if (!line.empty())
+            count++;
+    }
+
+    return count;
+}
 
 
 
