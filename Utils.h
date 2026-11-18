@@ -35,4 +35,33 @@ string spacesToUnderscore(string text)
     return text;
 }
 
+bool isBlank(string text)
+{
+    return text.find_first_not_of(' ') == string::npos;
+}
+
+string formatTime(const char* format)
+{
+    time_t now = time(0);
+    struct tm* local = localtime(&now);
+
+    char buffer[30];
+
+    strftime(buffer, 30, format, local);
+
+    return string(buffer);
+}
+
+string currentDate()
+{
+    return formatTime("%d-%m-%Y");
+}
+
+string currentTime()
+{
+    return formatTime("%H:%M:%S");
+}
+
+
+
 
