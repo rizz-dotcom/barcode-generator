@@ -52,3 +52,9 @@ User* findUser(string username, string password)
     return NULL;
 }
 
+bool isManagerLogin(string username, string password)
+{
+    User* u = findUser(username, password);
+
+    return u != NULL && u->role == "manager";
+}
