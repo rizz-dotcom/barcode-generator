@@ -1,68 +1,94 @@
-// Config.h
-// Libraries, namespaces, window size, colours, file names and settings
+// CategoryManager.h
+// Product categories stored in PCategory.txt
+// Line format:  CategoryId CategoryName CategoryAcronym #
+// Example:      15 Personal_Care PRC #
 
 #pragma once
 
-// Must come before the includes (stops Visual Studio warnings about localtime)
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+#include "Models.h"
+#include "Utils.h"
 
-#include <SFML/Graphics.hpp>
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <ctime>
-#include <cmath>
-#include <cstdlib>
-#include <cctype>
-#include <filesystem>
+vector<Category> categories;
 
-using namespace std;
-using namespace cv;
-using namespace sf;
+bool loadCategories()
+{
+    categories.clear();
 
-namespace fs = std::filesystem;
+    if (!fileExists(CATEGORY_FILE))
+        return false;
 
-// Layout size (the app is scaled to full screen from this size)
-const int WIDTH = 1100;
-const int HEIGHT = 700;
+    vector<vector<string>> records = readRecords(CATEGORY_FILE);
 
-// Business rules
-const int MAX_ITEMS = 8;                 // different products in one order
-const int LOW_STOCK_LIMIT = 5;           // stock at or below this is "LOW"
-const int EDIT_DAYS_LIMIT = 7;           // paid orders editable for 7 days
-const float MAX_SPECIAL_DISCOUNT = 8.0f; // special discount limit (percent)
+    for (size_t i = 0; i < records.size(); i++)
+    {
+        if (records[i].size() < 3)
+            continue;
 
-// Data files (kept in the Working Directory)
-const string PRODUCT_FILE = "Product.txt";
-const string CATEGORY_FILE = "PCategory.txt";
-const string ORDER_FILE = "Order.txt";
-const string ORDER_DETAIL_FILE = "OrderDetail.txt";
-const string BILL_FILE = "Bill.txt";
-const string BILL_DETAIL_FILE = "BillDetail.txt";
-const string SEASON_FILE = "Seasons.txt";
-const string USER_FILE = "Users.txt";
+        Category c;
 
-// Folders
-const string BARCODE_FOLDER = "Barcodes";
-const string BILL_FOLDER = "Bills";
+        c.id = records[i][0];
+        c.name = records[i][1];
+        c.acronym = records[i][2];
 
-// Colours
-Color background(18, 25, 38);
-Color sidebarColor(24, 34, 50);
-Color cardColor(32, 44, 62);
-Color buttonColor(40, 58, 78);
-Color accentColor(0, 190, 170);
-Color textColor(235, 240, 245);
-Color lightText(155, 170, 190);
-Color errorColor(235, 95, 95);
-Color warningColor(240, 180, 80);
+        categories.push_back(c);
+    }
 
-Font font;
+    std::sort(categories.begin(), categories.end(),
+        [](const Category& a, const Category& b)
+        {
+            return a.id < b.id;
+        });
+
+    return true;
+}
+
+bool saveCategories()
+{
+    vector<string> lines;
+
+    for (size_t i = 0; i < categories.size(); i++)
+    {
+        lines.push_back(categories[i].id + " " +
+            categories[i].name + " " +
+            categories[i].acronym + " #");
+    }
+
+    return writeLines(CATEGORY_FILE, lines);
+}
+
+int categoryIndex(string id)
+{
+    for (size_t i = 0; i < categories.size(); i++)
+    {
+        if (categories[i].id == id)
+            return (int)i;
+    }
+
+    return -1;
+}
+
+Category* findCategory(string id)
+{
+    int index = categoryIndex(id);
+
+    if (index < 0)
+        return NULL;
+
+    return &categories[index];
+}
+
+string categoryName(string id)
+{
+    Category* c = findCategory(id);
+
+    if (c == NULL)
+        return "Unknown";
+
+    return underscoreToSpaces(c->name);
+}
+
+// A category id is exactly 2 digits and not 00
+bool isValidCategoryId(string id)
+{
+    return id.length() == 2 && isDigits(id) && id != "00";
+}
