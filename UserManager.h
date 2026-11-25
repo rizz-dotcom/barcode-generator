@@ -40,3 +40,15 @@ void loadUsers()
             users.push_back(u);
     }
 }
+
+User* findUser(string username, string password)
+{
+    for (size_t i = 0; i < users.size(); i++)
+    {
+        if (users[i].username == username && users[i].password == password)
+            return &users[i];
+    }
+
+    return NULL;
+}
+
